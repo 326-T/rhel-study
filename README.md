@@ -49,6 +49,13 @@ chage -E 2023-12-31 user01
   %consultants ALL=(ALL) ALL
   ```
 ---
+
+## ファイルアクセス
+setgid(2)とあったら以下みたいにする。
+```
+chmod -R 2770 techdocs
+```
+
 ## プロセスの強制終了
 
 | シグナル        | 名前 | 定義                                                                                                                                                                                                                       |
