@@ -633,3 +633,13 @@ podman run -d --name db_01 --network frontend registry.lab.example.com/rhel8/mar
 podman run -d --name db_01 registry.lab.example.com/rhel8/mariadb-105
 podman network connect frontend db_01
 ```
+
+---
+## SSHの設定
+ホスト側の設定ファイルは`/etc/ssh/sshd_conf`
+```conf
+PermitRootLogin no
+Port 22
+ClientAliveInterval 600
+ClientAliveCountMax 0
+```
