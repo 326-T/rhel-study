@@ -1,73 +1,60 @@
 # ストレージの管理
 
-## 手動マウント
+## パーティション
 
-- mount
+`parted`コマンドを使用する。
 
-  ```bash
-  lsblk
-  mount /dev/vda4/ /mnt/data
-  ```
-
-  UUID を取得して指定する方法もある。
-
-  ```bash
-  lsblk -fp
-  mount UUID="efd314d0-b56e-45db-bbb3-3f32ae98f652" /mnt/data
-  ```
-
-- umount
-  ```bash
-  umount /mnt/data
-  ```
-
-## パーティションの作成
-
-パーティションテーブルの表示
+### GPT パーティションの作成
 
 ```bash
-parted /dev/vda print
-```
-
-パーティショニングセッションの作成
-
-```bash
-parted /dev/vda
-```
-
-新しいディスクにパーテションテーブルを書き込む
-
-```bash
-# MBR
-parted /dev/vdb mklabel msdos
-# GPT
-parted /dev/vdb mklabel gpt
-```
-
-パーティション作成後に認識されるまで待つコマンド
-
-```bash
-udevadm settle
-```
-
-パーティションの削除
-
-```bash
-[root@host ~]# parted /dev/vdb
-GNU Parted 3.4
-Using /dev/vdb
-Welcome to GNU Parted! Type 'help' to view a list of commands. (parted)
+$ parted /dev/vdb
+(parted) mklabel
+新しいディスクラベル? gpt
+(parted) mkpart
+パーティションの名前? []? userdata
+ファイルシステムの種類? [ext2]? xfs
+開始? 2048s
+終了? 1000MB
 (parted) print
-Model: Virtio Block Device (virtblk)
-Disk /dev/vdb: 5369MB
-Sector size (logical/physical): 512B/512B Partition Table: gpt
-Disk Flags:
-Number Start End Size File system Name Flags 1 1049kB 1000MB 999MB xfs usersdata
+...
+番号  開始     終了    サイズ  ファイルシステム  名前  フラグ
+1    1049kB  1000MB  999MB                 userdata
+(parted) quit
+$ udevadm settle
+```
+
+### MBR パーティションの作成
+
+```bash
+parted /dev/vdb
+(parted) mklabel
+新しいディスクラベル? msdos
+(parted) mkpart
+パーティションの種類? primary
+ファイルシステムの種類? [ext2]? xfs
+開始? 2048s
+終了? 1000MB
+(parted) print
+...
+番号  開始     終了    サイズ  ファイルシステム  フラグ
+1    1049kB  1000MB  999MB
+(parted) quit
+$ udevadm settle
+```
+
+### パーティションの削除
+
+```bash
+parted /dev/vdb
+(parted) print
+...
+番号  開始     終了    サイズ  ファイルシステム  フラグ
+1    1049kB  1000MB  999MB
 (parted) rm 1
 (parted) quit
-Information: You may need to update /etc/fstab.
-[root@host ~]#
 ```
+
+---
 
 ## ファイルシステムの作成
 
@@ -78,37 +65,55 @@ mkfs.ext4 /dev/vdb1
 mkfs.xfs /dev/vdb1
 ```
 
-## スワップ領域の作成
+---
+
+## マウント
+
+### mount
 
 ```bash
-[root@host ~]# parted /dev/vdb
-GNU Parted 3.4
-Using /dev/vdb
-Welcome to GNU Parted! Type 'help' to view a list of commands.
-(parted) print
-Model: Virtio Block Device (virtblk)
-Disk /dev/vdb: 5369MB
-Sector size (logical/physical): 512B/512B
-Partition Table: gpt
-Disk Flags:
-Number  Start   End     Size    File system  Name  Flags
- 1      1049kB  1001MB  1000MB               data
+lsblk
+mount /dev/vda4/ /mnt/data
+```
+
+### umount
+
+```bash
+umount /mnt/data
+```
+
+### UUID を取得して永続化する方法
+
+```bash
+lsblk -fp
+echo "UUID=efd314d0-b56e-45db-bbb3-3f32ae98f652 /mnt/data xfs defaults 0 0"
+```
+
+---
+
+## スワップ領域の作成
+
+### パーティションの作成
+
+```bash
+parted /dev/vdb
 (parted) mkpart
-Partition name? []? swap1
-File system type? [ext2]? linux-swap
-Start? 1001MB
-End? 1257MB
+パーティションの種類? swap1
+ファイルシステムの種類? [ext2]? linux-swap
+開始? 2048s
+終了? 1000MB
 (parted) print
-Model: Virtio Block Device (virtblk)
-Disk /dev/vdb: 5369MB
-Sector size (logical/physical): 512B/512B Partition Table: gpt
-Disk Flags:
-Number  Start   End     Size    File system     Name   Flags
- 1      1049kB  1001MB  1000MB                  data
-2 1001MB 1257MB 256MB linux-swap(v1) swap1
+...
+番号  開始     終了    サイズ  ファイルシステム  フラグ
+1    1049kB  1000MB  999MB
 (parted) quit
-Information: You may need to update /etc/fstab.
-[root@host ~]#
+$ udevadm settle
+```
+
+### スワップ領域のフォーマット
+
+```bash
+$ mkswap /dev/sdb2
 ```
 
 ### スワップ領域の有効化
@@ -117,9 +122,9 @@ Information: You may need to update /etc/fstab.
 
 ```bash
 swapon --show
-swapon /dev/vdb2
+swapon /dev/sdb2
 swapon --show
-swapoff /dev/vdb2
+swapoff /dev/sdb2
 swapon --show
 ```
 
@@ -131,6 +136,10 @@ free
 Mem:        8142192     1890440      907984      379232     5343768     5684432
 Swap:       1048572        1032     1047540
 ```
+
+---
+
+# 論理ボリューム
 
 ## ボリュームの作成
 
@@ -192,4 +201,44 @@ vgreduce vg01 /dev/vdb3
 lvremove /dev/vg01/lv01
 vgremove vg01
 pvremove /dev/vdb1 /dev/vdb2
+```
+
+---
+
+# stratis
+
+論理ボリュームをより便利にした形。
+
+## stratis のインストール
+
+```bash
+$ dns install stratis-cli stratised
+$ systemctl enable --now stratised
+```
+
+## pool の作成
+
+```bash
+$ stratis pool create pool1 /dev/vdb
+$ stratis pool list
+```
+
+## pool に追加
+
+```bash
+$ stratis pool add-data pool1 /dev/vdc
+$ stratis blockdev list pool1
+```
+
+## pool から filesystem を作成
+
+```bash
+$ stratis filesystem create pool1 fs1
+$ stratis filesystem list
+```
+
+## mount
+
+```bash
+$ mount /dev/stratis/pool1/fs1 /mnt/device
 ```

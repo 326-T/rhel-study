@@ -64,8 +64,29 @@ unconfined_u:object_r:default_t:s0 /virtual
 
 ```shell
 $ semanage fcontext -l
+# コンテキストの追加
 $ semanage fcontext -a -t httpd_sys_content_t '/virtual(/.*)?'
 ```
+
+---
+
+## Booleans
+
+あるシステムがあるディレクトリにアクセスできるかどうかを Boolean でオンオフできる機能。コンパイルなしにすぐ適用できる点がメリット。
+
+- 状態の確認
+  ```bash
+  $ getsebool -a
+  ```
+- 一時的な変更
+  ```bash
+  # setsebool boolean_name on|off
+  $ setsebool httpd_use_samba on
+  ```
+- 恒久的な変更
+  ```bash
+  $ setsebool -P httpd_usesamba on
+  ```
 
 ## 演習用
 

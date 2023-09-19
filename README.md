@@ -33,10 +33,6 @@ map auto_home           0         0         0   100%       0          0  100%   
 /dev/disk3s1    965595304  25348232 714783480     4%  356052 3573917400    0%   /System/Volumes/Update/mnt1
 ```
 
-# Stratis
-
-いったん割愛
-
 # ログの分析と保存
 
 ## journalctl
