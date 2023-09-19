@@ -1,15 +1,13 @@
 # SELinux
 
-## ファイルコンテキスト
-
-```
-unconfined_u:object_r:httpd_sys_content_t:s0 /var/www/html/file2
-SELinux User:Role:Type:Level File
-```
+Linux のセキュリティを向上する。chmod ではカバーできない範囲をカバーする。<br>
+SE Linux に関するエラーログは`journalctl`で確認できる。
 
 ## SELinux モードの変更
 
-```bash
+### 簡易的な変更
+
+```shell
 $ getenforce
 Enforcing
 $ setenforce 0
@@ -20,9 +18,40 @@ $ getenforce
 Enforcing
 ```
 
+### 永続的な変更
+
+`/etc/selinux/config`に書き込む。
+
+```config
+SELINUX=enforcing
+```
+
+### モードの種類
+
+| モード     | 有効 | ログ |
+| ---------- | ---- | ---- |
+| Enforcing  | YES  | YES  |
+| Permissive | NO   | YES  |
+| Disabled   | NO   | NO   |
+
+---
+
+## ファイルコンテキスト
+
+```
+$ ls -lZ
+drwxr-xr-x. 5 user user  unconfined_u:object_r:httpd_sys_content_t:s0 /var/www/html/file2
+```
+
+| SELinux User | Role     | Type                | Level | File                |
+| ------------ | -------- | ------------------- | ----- | ------------------- |
+| unconfined_u | object_r | httpd_sys_content_t | s0    | /var/www/html/file2 |
+
+---
+
 ## SELinux コンテキストの変更
 
-```bash
+```shell
 $ chcon -t httpd_sys_content_t /virtual
 $ ls -Zd /virtual
 unconfined_u:object_r:httpd_sys_content_t:s0 /virtual
@@ -33,7 +62,7 @@ unconfined_u:object_r:default_t:s0 /virtual
 
 ## SELinux ファイルコンテキストの一覧
 
-```bash
+```shell
 $ semanage fcontext -l
 $ semanage fcontext -a -t httpd_sys_content_t '/virtual(/.*)?'
 ```
@@ -42,7 +71,7 @@ $ semanage fcontext -a -t httpd_sys_content_t '/virtual(/.*)?'
 
 エラーを確認
 
-```bash
+```shell
 $ less /var/log/messages
 ...output omitted...
 Apr 7 06:16:15 serverb setroubleshoot[26509]: failed to retrieve rpm info for /
@@ -58,7 +87,7 @@ httpd from getattr access on the file /lab-content/lab.html
 
 指摘されたコマンドを実行
 
-```bash
+```shell
 $ sealert -l 35c9e452-2552-4ca3-8217-493b72ba6d0b
 SELinux is preventing /usr/sbin/httpd from getattr access on the file /labcontent/lab.html.
 ***** Plugin catchall_labels (83.8 confidence) suggests *******************
@@ -96,7 +125,7 @@ Raw Audit Messages
 
 audit.log を検索
 
-```bash
+```shell
 $ ausearch -m AVC -ts recent
 ...output omitted...
 ----
@@ -116,7 +145,7 @@ type=AVC msg=audit(1649326572.086:407): avc: denied { getattr } for
 
 コンテキストを比較
 
-```bash
+```shell
 $ ls -dZ /lab-content /var/www/html
 unconfined_u:object_r:default_t:s0 /lab-content
 system_u:object_r:httpd_sys_content_t:s0 /var/www/html
@@ -124,7 +153,7 @@ system_u:object_r:httpd_sys_content_t:s0 /var/www/html
 
 コンテキストをデフォルトに戻す
 
-```bash
+```shell
 $ semanage fcontext -a \
 -t httpd_sys_content_t '/lab-content(/.*)?'
 $ restorecon -R /lab-content/

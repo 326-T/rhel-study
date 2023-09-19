@@ -5,7 +5,7 @@
 ### ログインやパスワードの設定
 
 ```bash
-cat /etc/shadow
+$ cat /etc/shadow
 user03:$6$CSsXsd3rwghsdfarf:17933:0:99999:7:2:18113:
 ```
 
@@ -22,21 +22,21 @@ user03:$6$CSsXsd3rwghsdfarf:17933:0:99999:7:2:18113:
 user01 のパスワードポリシーを変更する。
 
 ```bash
-chage -m 0 -M 90 -W 7 -I 14 user01
+$ chage -m 0 -M 90 -W 7 -I 14 user01
 ```
 
 パスワードを変更する
 
 ```bash
-passwd user01
+$ passwd user01
 ```
 
 90 日後にパスワードを有効期限切れになるようにする
 
 ```bash
-date -d "+90 days" +%F
+$ date -d "+90 days" +%F
 2023-12-31
-chage -E 2023-12-31 user01
+$ chage -E 2023-12-31 user01
 ```
 
 全体に適用する。`/etc/login.defs`
@@ -66,7 +66,33 @@ chage -E 2023-12-31 user01
 ## ファイルアクセス
 
 setgid(2)とあったら以下みたいにする。
+setuid(4), stickybit は 0。
 
 ```
 chmod -R 2770 techdocs
 ```
+
+---
+
+# ACL
+
+もしかしたら古い試験範囲かも
+
+- ユーザにパーミッション付与
+  ```bash
+  $ setfacl -m u:user:rwx /path/to/file
+  $ setfacl -Rm u:user:rwx /path/to/directory
+  ```
+- グループにパーミッション付与
+  ```bash
+  $ setfacl -m g:group:rwx /path/to/file
+  $ setfacl -Rm g:group:rwx /path/to/directory
+  ```
+- ユーザからパーミッション削除
+  ```bash
+  $ setfacl -x u:user /path/to/file
+  ```
+- 全てのユーザからパーミッション削除
+  ```bash
+  $ setfacl -b /path/to/file
+  ```
