@@ -52,7 +52,7 @@ $ nmcli con show
 
 ```bash
 $ sudo hostname new_hostname
-$ sudo hostnamectl set-hostname new_hostname
+$ sudo hostnamectl hostname new_hostname
 ```
 
 ### ip address
