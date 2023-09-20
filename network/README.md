@@ -43,3 +43,35 @@ $ nmcli dev status
 # 接続情報
 $ nmcli con show
 ```
+
+---
+
+## nmcli
+
+### hostname
+
+```bash
+$ sudo hostname new_hostname
+$ sudo hostnamectl set-hostname new_hostname
+```
+
+### ip address
+
+```bash
+$ sudo nmcli con mod eth0 ipv4.address "192.168.1.2/24"
+$ sudo nmcli con down eth0 && sudo nmcli con up eth0
+```
+
+### gateway
+
+```bash
+$ sudo nmcli con mod eth0 ipv4.dns "8.8.8.8,8.8.4.4"
+$ sudo nmcli con down eth0 && sudo nmcli con up eth0
+```
+
+### DNS
+
+```bash
+$ sudo nmcli con mod eth0 ipv4.gateway "192.168.1.1"
+$ sudo nmcli con down eth0 && sudo nmcli con up eth0
+```
