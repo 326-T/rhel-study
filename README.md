@@ -45,31 +45,54 @@ map auto_home           0         0         0   100%       0          0  100%   
 
 - [x] 画面が操作しづらすぎる。問題文とコンソールを Split View したい
 - [x] トラックパッド非対応。有線マウス必須。
-- [ ] chmod, chown はいいとして、そのディレクトリに後で作られたファイルにも適用するのってどうするんだっけ？facl でした。
-- [ ] umask でデフォルトのパーミッションを決める
-- [ ] シェルが使えないユーザとは
-- [ ] ホームディレクトリに対するデフォルトパーミッション<br>
+- [x] chmod, chown はいいとして、そのディレクトリに後で作られたファイルにも適用するのってどうするんだっけ？
+  ```bash
+  setfacl -b /group_dir
+  setfacl -mR g:group:rwx /group_dir
+  ```
+- [x] umask でデフォルトのパーミッションを決める
+- [x] シェルが使えないユーザとは
+      
+   ```sh
+   sudo useradd -s /sbin/nologin username
+   or
+   sudo usermod -s /sbin/nologin username
+   ```
+- [x] ホームディレクトリに対するデフォルトパーミッション<br>
       デフォルトのパーミッションをファイルとフォルダ別で
 - [x] `nmcli con mod ens3 ipv4.address 192.168.1.10`
       はダッシュいらない
-- [ ] pvcreate, vgcreate, lvcreate
-- [ ] pvcreate できん。vg はパンパン。lsblk でデバイス探すべきだったぽい
-- [ ] コンテナでデーモンプロセス作る
-- [ ] autofs
-- [ ] chronyc
-- [ ] ntp
-- [ ] 多分できたけど find コマンドの使い方
+- [x] pvcreate, vgcreate, lvcreate
+- [x] pvcreate できん。vg はパンパン。lsblk でデバイス探すべきだったぽい
+- [x] コンテナでデーモンプロセス作る
+- [x] autofs
+- [x] chronyc, ntp
+
+  デーモンがchronyd、chronycコマンドを使うか、/etc/chrony.confのserverかpool行を編集する。
+
+- [x] 多分できたけど find コマンドの使い方
+  ```
+  sudo find / -user simone -type f 2>/dev/null | xargs -I {} cp {} /path/to/target_directory/
+  ```
+
 - [ ] SELinux のポート付与はできた。ファイルアクセスは多分できた。
 - [x] crontab 秒指定できない
-- [ ] dnf で設定すれば yum も設定される？
-- [ ] デフォルトのレポジトリって?
-- [ ] tuned-adm の永続化ってどうやるの？tuned-adm recommend でデフォルトを指定すればよかったらしい
+- [x] dnf で設定すれば yum も設定される？設定される。
+- [x] デフォルトのレポジトリって?
+
+  enabledを見る。
+  `/etc/yum.repos.d/~`のファイルで確認して
+- [x] tuned-adm の永続化ってどうやるの？
+
+  そもそも揮発性じゃない。<br>
 - [ ] デフォルトコンテキストポリシーは正規表現でやるやつ
 
 ## わかったけどできてないかも
 
-- [ ] find で所有者を絞る
-- [ ] find で
+- [x] find で所有者を絞る
+  ```bash
+  find / -user simone -type f 2>/dev/null
+  ```
 
 ## 復習してて次出そうなやつ
 

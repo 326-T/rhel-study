@@ -212,8 +212,8 @@ pvremove /dev/vdb1 /dev/vdb2
 ## stratis のインストール
 
 ```bash
-$ dns install stratis-cli stratised
-$ systemctl enable --now stratised
+$ dnf install stratis-cli stratisd
+$ systemctl enable --now stratisd
 ```
 
 ## pool の作成

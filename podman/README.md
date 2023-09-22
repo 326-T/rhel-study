@@ -35,3 +35,14 @@ podman run -d --name db_01 --network frontend registry.lab.example.com/rhel8/mar
 podman run -d --name db_01 registry.lab.example.com/rhel8/mariadb-105
 podman network connect frontend db_01
 ```
+
+
+## コンテナのデーモン化
+```shell
+cd ~/.config/systemd/user
+podman generate systemd --name webapp --files --now
+podman stop webapp
+podman rm webapp
+systemctl --user daemon-reload
+systemctl enable --now --user container-webapp.service
+```
