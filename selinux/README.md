@@ -85,7 +85,7 @@ $ semanage fcontext -a -t httpd_sys_content_t '/virtual(/.*)?'
   ```
 - 恒久的な変更
   ```bash
-  $ setsebool -P httpd_usesamba on
+  $ setsebool -P httpd_use_samba on
   ```
 
 ## 演習用

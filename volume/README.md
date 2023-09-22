@@ -172,7 +172,7 @@ lvdisplay /dev/bf01/lv01
 # 物理ボリュームの追加
 vgextend vg01 /dev/vdb3
 # 論理ボリュームの拡張
-lvextend -L + 5000M /dev/vg01/lv01
+lvextend -L +5000M /dev/vg01/lv01
 # XFSファイルシステムを論理ボリュームの最大値で確保する
 xfs_growfs /mnt/data
 # EXT4ファイルシステムを論理ボリュームの最大値で確保する
@@ -184,7 +184,7 @@ resize2fs /dev/vg01/lv01
 ```bash
 swapoff -v /dev/vg01/swap
 lvextend -L +300M /dev/vg01/swap
-mkswap /dev/vg01/wsap
+mkswap /dev/vg01/swap
 swapon /dev/vg01/swap
 ```
 

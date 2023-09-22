@@ -20,7 +20,7 @@
    ```
 1. SELinux の完全な再ラベル付けが実行されるように設定
    ```bash
-   $ touch /.autolabel
+   $ touch /.autorelabel
    ```
 
 ---
